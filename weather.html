@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Pragma" content="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
+<style>
+* {
+    box-sizing: border-box;
+}
+
+/* Add a gray background color with some padding */
+body {
+    font-family: Arial;
+    padding: 2px;
+/*    background: #f1f1f1; */
+}
+
+/* Header/Blog Title */
+.header {
+    padding: 3px;
+    font-size: 30px;
+    text-align: left;
+    background: #f1f1f1;
+}
+
+/* Create two unequal columns that floats next to each other */
+/* Left column */
+.leftcolumn {   
+    float: left;
+    width: 30%;
+}
+
+/* Right column */
+.rightcolumn {
+    float: left;
+    width: 70%;
+    padding-left: 1px;
+}
+
+/* Fake image */
+.fakeimg {
+    background-color: #aaa;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Add a card effect for articles */
+.card {
+     background-color: white;
+     padding: 2px;
+     margin-top: 2px;
+}
+
+.temperature {
+     background-color: white;
+     font-size: 50px;
+     text-align: center;
+     padding: 2px;
+     margin-top: 2px;
+     background: #f1f1d1;
+}
+
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Footer */
+.footer {
+/*    padding: 20px; */
+    text-align: center;
+    background: #fdd;
+    margin-top: 5px;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+    .leftcolumn, .rightcolumn {   
+        width: 100%;
+        padding: 0;
+    }
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%; 
+    border: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+
+</style>
+</head>
+
+<script>
+/* TODO - singenton */
+var i = 0;
+
+var ajaxUpdateCurrent = function UpdateCurrent() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+
+      var myObj = JSON.parse(this.responseText);
+
+      document.getElementById("temper").innerHTML = myObj.temp;
+      document.getElementById("pres").innerHTML = myObj.pres;
+      document.getElementById("sky").innerHTML = myObj.sky;
+      document.getElementById("wind").innerHTML = myObj.wind;
+      document.getElementById("rh").innerHTML = myObj.rh;
+      
+      time = myObj.time.split(" ")
+      
+      document.getElementById("updTime").innerHTML = time[0]+time[1]+" "+time[5]+"-"+ time[4]+"-"+time[6];
+      document.getElementById("rem").innerHTML = ""
+
+
+    }
+  };
+  xhttp.open("GET", "/current?"+i, true);
+  i +=1;
+  xhttp.send();
+  setTimeout(ajaxUpdateCurrent, 60000);
+}
+
+var ajaxUpdateZone = function UpdateZone() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+//      forecasts_zone = document.getElementById("forecasts_zone") ;
+
+      var myObj = JSON.parse(this.responseText);
+
+      zoneStr  = "<table>"
+      zoneStr += "<tr><td>" + myObj.time  + "</td></tr>";
+
+      for (l=0; l<myObj.data.length; l++) {
+        elm = myObj.data[l];
+        zoneStr += "<tr><td>" + "<b>" + elm[0] + "</b> "+ elm[1]+ "</td></tr>" ;
+      }
+      document.getElementById("forecasts_zone").innerHTML = zoneStr + "</table>";
+    }
+  };
+  xhttp.open("GET", "/forecasts_zone?"+i, true);
+  i +=1;
+  xhttp.send();
+  setTimeout(ajaxUpdateZone, 60000);
+}
+
+var ajaxUpdateWeek = function UpdateWeek() {
+  var xhttp = new XMLHttpRequest();
+  
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+
+      var myObj = JSON.parse(this.responseText);
+      time = myObj.time.split(" ")
+      zoneStr  =  time[0]+time[1]+" "+time[5]+"-"+ time[4]+"-"+time[6] + "<br>";
+
+
+      zoneStr += "<table>"
+
+      zoneStr += "<tr><th>DoW</th>";
+      zoneStr += "<th>Sky</th>";
+      zoneStr += "<th>Tempr</th>";
+      zoneStr += "<th>Precp</th>";
+      zoneStr += "</tr>" ;
+
+
+      for (l=0; l<myObj.data.length; l++) {
+        elm = myObj.data[l];
+        zoneStr += "<tr><td><b>" + elm[0] + "</b></td>";
+        zoneStr += "<td>"+ elm[2]+ "</td>";
+        zoneStr += "<td>"+ elm[3]+ "</td>";
+        zoneStr += "<td>"+ elm[4]+ "</td>";
+        zoneStr += "</tr>" ;
+      }
+      document.getElementById("forecasts_week").innerHTML = zoneStr + "</table>";
+    }
+  };
+
+  xhttp.open("GET", "/forecasts_week?"+i, true);
+  i +=1;
+  xhttp.send();
+  setTimeout(ajaxUpdateWeek, 60000);
+}
+
+</script>
+
+<body>
+
+<div class="header">
+  Important Messages
+</div>
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="temperature" id=temper>
+      0.0C / 32F
+    </div>
+    <div id="updTime">Sep 2, 2017</div>
+    <div class="card">
+      <table>
+      <tr><td>Pre</td><td id="pres">00</td></tr>
+      <tr><td>Sky</td><td id="sky">00</td></tr>
+      <tr><td>Wnd</td><td id="wind">00</td></tr>
+      <tr><td>RH</td><td id="rh">00</td></tr>
+      </table>
+      <div id="rem">comments here</div>
+      <div id="forecasts_week"> </div>
+
+    </div>
+  </div>
+  <div class="rightcolumn">
+    <div id="forecasts_zone">
+      <table>
+      <tr><td>Mon</td><td>00</td></tr>
+      <tr><td>Tue</td><td>00</td></tr>
+      <tr><td>Wed</td><td>00</td></tr>
+      <tr><td>Thu</td><td>00</td></tr>
+      </table>
+    </div>
+    <div id="forecasts_rem"> </div>
+  </div>
+</div>
+
+<div class="footer" id="Footer">
+  <h2>Footer</h2>
+</div>
+<button type="button" onclick="ajaxUpdateCurrent()">update Current</button>
+<button type="button" onclick="ajaxUpdateWeek()">update week</button>
+<button type="button" onclick="ajaxUpdateZone()">update Zone</button>
+</body>
+</html>
+ 
