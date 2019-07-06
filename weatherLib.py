@@ -1,11 +1,12 @@
 import SimpleHTTPServer
-import SocketServer
-from thread import start_new_thread
+#  import SocketServer
+# from thread import start_new_thread
 import time
-import glob
+# import glob
 import urllib2
 import re
 import json
+import sys
 
 class weatherNOAA():
     city="City"
@@ -16,9 +17,9 @@ class weatherNOAA():
         self.Zone="nyz003"
         self.City="Rochester"
         self.dateRegEx = re.compile("[0-9]{3,4}\s+[AP]M.+\s[0-9]{4}")
-        self.urlCurrent = "http://tgftp.nws.noaa.gov/data/observations/state_roundup/{}/{}.txt".format(self.State,self.Zone)
-        self.urlZone = "http://tgftp.nws.noaa.gov/data/forecasts/zone/{}/{}.txt".format(self.State,self.Zone)
-        self.urlState = "http://tgftp.nws.noaa.gov/data/forecasts/state/{}/{}.txt".format(self.State,self.Zone)
+        self.urlCurrent = "https://tgftp.nws.noaa.gov/data/observations/state_roundup/{}/{}.txt".format(self.State,self.Zone)
+        self.urlZone = "https://tgftp.nws.noaa.gov/data/forecasts/zone/{}/{}.txt".format(self.State,self.Zone)
+        self.urlState = "https://tgftp.nws.noaa.gov/data/forecasts/state/{}/{}.txt".format(self.State,self.Zone)
         
         return
         
@@ -141,10 +142,13 @@ http://tgftp.nws.noaa.gov/data/observations/metar/decoded/KROC.TXT
                 continue
 
             if prnt :
-                a=[] 
+#               a=[]
+                a = s.split()
                 for i in range(0,7) :
-                    j=i*9
-                    state[i].append(s[j:j+9].strip())
+                     state[i].append(a[i])
+#                    j=i*9
+#                    state[i].append(s[j:j+9].strip())
+		
                 prnt -= 1
 
         return {"time":capTime,"data":state}
@@ -209,13 +213,12 @@ if __name__ == "__main__" :
 
     W = weatherNOAA()
 
-    current = W.getCurrent()
+    jsonOut={"reportTime":time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), \
+              "weather_now":W.getCurrent() ,\
+              "forecasts_week":W.forecasts_week(),\
+              "forecasts_zone":W.forecasts_zone()}
 
-    print current["time"]
-
-    print json.dumps(current)
-
-    print json.dumps(W.forecasts_week())
-
-    print json.dumps(W.forecasts_zone())
-
+    print json.dumps(jsonOut)
+    if len(sys.argv) > 1 :
+        with open(sys.argv[1],"w") as jsonFile:
+            jsonFile.write(json.dumps(jsonOut)+"\n")

@@ -111,60 +111,55 @@ var ajaxUpdateCurrent = function UpdateCurrent() {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
 
+
       var myObj = JSON.parse(this.responseText);
 
-      document.getElementById("temper").innerHTML = myObj.temp;
-      document.getElementById("pres").innerHTML = myObj.pres;
-      document.getElementById("sky").innerHTML = myObj.sky;
-      document.getElementById("wind").innerHTML = myObj.wind;
-      document.getElementById("rh").innerHTML = myObj.rh;
+      document.getElementById("Message").innerHTML = myObj.reportTime ;
+
+      Weather=myObj.weather_now ;
+
+      document.getElementById("temper").innerHTML = Weather.temp;
+      document.getElementById("pres").innerHTML = Weather.pres;
+      document.getElementById("sky").innerHTML = Weather.sky;
+      document.getElementById("wind").innerHTML = Weather.wind;
+      document.getElementById("rh").innerHTML = Weather.rh;
       
-      time = myObj.time.split(" ")
+      time = Weather.time.split(" ")
       
       document.getElementById("updTime").innerHTML = time[0]+time[1]+" "+time[5]+"-"+ time[4]+"-"+time[6];
       document.getElementById("rem").innerHTML = ""
 
+      UpdateZone(myObj);
+
+      UpdateWeek(myObj);
 
     }
   };
-  xhttp.open("GET", "/current?"+i, true);
+  xhttp.open("GET", "weather.json", true);
   i +=1;
   xhttp.send();
   setTimeout(ajaxUpdateCurrent, 60000);
 }
 
-var ajaxUpdateZone = function UpdateZone() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-//      forecasts_zone = document.getElementById("forecasts_zone") ;
+function UpdateZone(myObj) {
 
-      var myObj = JSON.parse(this.responseText);
+      Weather=myObj.forecasts_zone;
 
       zoneStr  = "<table>"
-      zoneStr += "<tr><td>" + myObj.time  + "</td></tr>";
+      zoneStr += "<tr><td>" + Weather.time  + "</td></tr>";
 
-      for (l=0; l<myObj.data.length; l++) {
-        elm = myObj.data[l];
+      for (l=0; l<Weather.data.length; l++) {
+        elm = Weather.data[l];
         zoneStr += "<tr><td>" + "<b>" + elm[0] + "</b> "+ elm[1]+ "</td></tr>" ;
       }
       document.getElementById("forecasts_zone").innerHTML = zoneStr + "</table>";
-    }
   };
-  xhttp.open("GET", "/forecasts_zone?"+i, true);
-  i +=1;
-  xhttp.send();
-  setTimeout(ajaxUpdateZone, 60000);
-}
 
-var ajaxUpdateWeek = function UpdateWeek() {
-  var xhttp = new XMLHttpRequest();
-  
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
+function UpdateWeek(myObj) {
 
-      var myObj = JSON.parse(this.responseText);
-      time = myObj.time.split(" ")
+      Weather=myObj.forecasts_week;
+
+      time = Weather.time.split(" ")
       zoneStr  =  time[0]+time[1]+" "+time[5]+"-"+ time[4]+"-"+time[6] + "<br>";
 
 
@@ -177,8 +172,8 @@ var ajaxUpdateWeek = function UpdateWeek() {
       zoneStr += "</tr>" ;
 
 
-      for (l=0; l<myObj.data.length; l++) {
-        elm = myObj.data[l];
+      for (l=0; l<Weather.data.length; l++) {
+        elm = Weather.data[l];
         zoneStr += "<tr><td><b>" + elm[0] + "</b></td>";
         zoneStr += "<td>"+ elm[2]+ "</td>";
         zoneStr += "<td>"+ elm[3]+ "</td>";
@@ -187,19 +182,12 @@ var ajaxUpdateWeek = function UpdateWeek() {
       }
       document.getElementById("forecasts_week").innerHTML = zoneStr + "</table>";
     }
-  };
-
-  xhttp.open("GET", "/forecasts_week?"+i, true);
-  i +=1;
-  xhttp.send();
-  setTimeout(ajaxUpdateWeek, 60000);
-}
 
 </script>
 
 <body>
 
-<div class="header">
+<div class="header" id=Message>
   Important Messages
 </div>
 
