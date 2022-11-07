@@ -1,12 +1,14 @@
-import SimpleHTTPServer
-#  import SocketServer
+import http.server
 # from thread import start_new_thread
 import time
 # import glob
-import urllib2
+import urllib.request
 import re
 import json
 import sys
+
+# airport
+# https://tgftp.nws.noaa.gov/data/observations/metar/decoded/KROC.TXT
 
 class weatherNOAA():
     city="City"
@@ -28,11 +30,11 @@ class weatherNOAA():
 #             setattr(self, var, current[var])
     
     def fetchData(self,fromURL) :
-        print "Reading", fromURL
-        req = urllib2.Request(fromURL)
+        print("Reading", fromURL)
+        req = urllib.request.Request(fromURL)
         req.add_header('Cache-Control', 'max-age=0')
-        resp = urllib2.urlopen(req)
-        content = resp.read()
+        resp = urllib.request.urlopen(req)
+        content = resp.read().decode('utf-8')
         resp.close()
         return content.split("\n")
 
@@ -218,7 +220,7 @@ if __name__ == "__main__" :
               "forecasts_week":W.forecasts_week(),\
               "forecasts_zone":W.forecasts_zone()}
 
-    print json.dumps(jsonOut)
+    print( json.dumps(jsonOut))
     if len(sys.argv) > 1 :
         with open(sys.argv[1],"w") as jsonFile:
             jsonFile.write(json.dumps(jsonOut)+"\n")
