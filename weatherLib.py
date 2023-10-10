@@ -11,24 +11,17 @@ import sys
 # https://tgftp.nws.noaa.gov/data/observations/metar/decoded/KROC.TXT
 
 class weatherNOAA():
-    city="City"
-    sky="sky"
     
-    def __init__(self):
-        self.State="ny"
-        self.Zone="nyz003"
-        self.City="Rochester"
+    def __init__(self, State="ny", Zone="nyz003", City="Rochester"):
+        self.State=State
+        self.Zone=Zone
+        self.City=City
         self.dateRegEx = re.compile("[0-9]{3,4}\s+[AP]M.+\s[0-9]{4}")
         self.urlCurrent = "https://tgftp.nws.noaa.gov/data/observations/state_roundup/{}/{}.txt".format(self.State,self.Zone)
         self.urlZone = "https://tgftp.nws.noaa.gov/data/forecasts/zone/{}/{}.txt".format(self.State,self.Zone)
         self.urlState = "https://tgftp.nws.noaa.gov/data/forecasts/state/{}/{}.txt".format(self.State,self.Zone)
-        
         return
         
-#         self.tmp = current["temp"]
-#         for var in current:
-#             setattr(self, var, current[var])
-    
     def fetchData(self,fromURL) :
         print("Reading", fromURL)
         req = urllib.request.Request(fromURL)
@@ -84,7 +77,6 @@ http://tgftp.nws.noaa.gov/data/observations/metar/decoded/KROC.TXT
                 dateTime = ln.strip()
             
             currentLineN +=1
-    #        m = reCurrentWeather.match(ln)
             rec = {}
             s = 0
             e = 0
@@ -184,7 +176,6 @@ becoming east 5 to 10 mph. Chance of rain 60 percent.
             
             m = self.dateRegEx.match(ln)
             if m:
-#                zoneA[0] = ln
                 Time=ln
                 continue
             

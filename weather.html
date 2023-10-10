@@ -185,7 +185,7 @@ function UpdateWeek(myObj) {
 
 </script>
 
-<body>
+<body onload="ajaxUpdateCurrent();">
 
 <div class="header" id=Message>
   Important Messages
@@ -225,9 +225,6 @@ function UpdateWeek(myObj) {
 <div class="footer" id="Footer">
   <h2>Footer</h2>
 </div>
-<button type="button" onclick="ajaxUpdateCurrent()">update Current</button>
-<button type="button" onclick="ajaxUpdateWeek()">update week</button>
-<button type="button" onclick="ajaxUpdateZone()">update Zone</button>
 </body>
 </html>
  
