@@ -1,3 +1,0 @@
-#!/bin/bash
-
-/usr/bin/python3 /hd2/home/vladimir/WeatherCast/weatherLib.py /tmp/weather.json
